@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comment Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+        }
+        .split {
+            width: 50%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .left {
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .right {
+            overflow-y: auto;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 16px;
+            resize: vertical;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #comments {
+            margin-top: 20px;
+        }
+        .comment-category {
+            margin-bottom: 20px;
+        }
+        .comment-category h3 {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .comment-category p {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="split left">
+        <h2>Comment Generator</h2>
+        <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+        <button onclick="generateComments()">Generate Comments</button>
+    </div>
+    <div class="split right">
+        <div id="comments"></div>
+    </div>
+
+    <script>
+        function generateComments() {
+            var inputText = document.getElementById("inputText").value;
+            fetch('http://127.0.0.1:5000/generate_comments', {  // Change this to your backend's URL
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: inputText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayComments(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function displayComments(comments) {
+            var commentsDiv = document.getElementById("comments");
+            commentsDiv.innerHTML = "";
+            for (var type in comments) {
+                var comment = comments[type];
+                var categoryDiv = document.createElement("div");
+                categoryDiv.className = "comment-category";
+                
+                var categoryHeader = document.createElement("h3");
+                categoryHeader.textContent = type;
+                categoryDiv.appendChild(categoryHeader);
+                
+                var commentElement = document.createElement("p");
+                commentElement.textContent = comment;
+                categoryDiv.appendChild(commentElement);
+                
+                commentsDiv.appendChild(categoryDiv);
+            }
+        }
+    </script>
+</body>
+</html>
